@@ -6,4 +6,4 @@ Run setup.py first , then run main.py
 
 
 CREATE USER 'admin'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost';
+GRANT ALL PRIVILEGES ON \*.\* TO 'admin'@'localhost';
