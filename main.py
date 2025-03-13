@@ -1,4 +1,4 @@
-from db import cursor
+from db import cursor, cnx
 from flask import Flask, jsonify, render_template, request, redirect
 
 cursor.execute("USE vehicle_rental_db")
@@ -18,6 +18,7 @@ def get_data():
     if request.method == "POST":
         data = request.form["data"]
         cursor.execute(f"INSERT INTO Bookings (status) VALUES ('{data}')")
+        cnx.commit()
 
     return redirect("/")
 
