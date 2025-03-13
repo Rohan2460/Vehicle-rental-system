@@ -1,0 +1,15 @@
+<form action="/data" method="post">
+    <label for="">Data</label>
+    <input type="text" name="data">
+
+    <button type="submit">Submit</button>
+</form>
+
+<hr>
+{% if data %}
+
+{% for item in data %}
+    <p>{{item}}</p>
+{% endfor %}
+
+{% endif %}
