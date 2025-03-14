@@ -2,14 +2,23 @@
     <label for="">Data</label>
     <input type="text" name="data">
 
+    <label for="">Amount</label>
+    <input type="text" name="amount">
+
+    <label for="">Customer ID</label>
+    <input type="text" name="c_id">
+
     <button type="submit">Submit</button>
 </form>
 
 <hr>
 {% if data %}
-
+<h3>Bookings of {{customer}}</h3>
 {% for item in data %}
-    <p>{{item}}</p>
+    <span>ID: {{item[0]}} | </span>
+    <span>Data: {{item[1]}} | </span>
+    <span>Amount: {{item[2]}}</span>
+    <hr>
 {% endfor %}
 
 {% endif %}
