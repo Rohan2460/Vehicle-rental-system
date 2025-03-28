@@ -1,3 +1,6 @@
+from db import cursor, cnx
+
+
 class Field:
     name = None
     field_type = None
@@ -9,7 +12,7 @@ class Field:
 
     def __set_name__(self, owner:object, name:str):
         self.name = name
-        self.table_name = owner.__name__
+        self.table_name = vars(owner)["table_name"]
         
     def __init__(self, f_type:str|int, max:int=max_size, primary_key:bool=False, foreign_key:object=None, auto_increment:bool=False):
         self.field_type = f_type
@@ -22,18 +25,20 @@ class Field:
         return self
 
     def get(self):
-        query = f"{self.name} {'INT' if self.field_type == int else 'VARCHAR'}({self.max_size})"
+        query = f"{self.name} {'INT' if self.field_type == int else f'VARCHAR ({self.max_size})'}"
         if self.primary_key:
-            query += " PRIMARY KEY"
+            query += " NOT NULL PRIMARY KEY"
         if self.foreign_key:
-            query += f" FOREIGN KEY REFERENCES {self.foreign_key.table_name}({self.foreign_key.name})"
+            query += f", FOREIGN KEY ({self.name}) REFERENCES {self.foreign_key.table_name}({self.foreign_key.name})"
         if self.auto:
-            query += " AUTO_INCREMENT"
+            query += " NOT NULL AUTO_INCREMENT"
         return query
 
 
 
 class Table:
+    cnx = cnx
+    cursor = cursor
 
     def get_fields(self, as_obj=False) -> list[str | Field]:
         data = []
@@ -42,7 +47,7 @@ class Table:
                 data.append(value if as_obj else key)
         return data
     
-    def fetch(self, fields=None):        
+    def fetch(self, fields:list=None) -> list[dict]:   
         data = self.get_fields()
         query = ""
         _fields = []
@@ -56,8 +61,25 @@ class Table:
         query = ", ".join(_fields)  if _fields else "*"
         query = "SELECT " + query + f" FROM {vars(self.__class__)["table_name"]}"
 
-        print("Fetched:", query)
+        print("Fetch:", query)
+        cursor.execute(query)
 
+        temp_list = []
+        for tup in cursor.fetchall():
+            temp_dict = {} 
+            for val, name in zip(tup, fields if fields else data):
+                temp_dict[name] = val
+            temp_list.append(temp_dict)
+        return temp_list
+    
+    def raw_fetch(self, statement:str):
+        cursor.execute(statement)
+        return cursor.fetchall()
+
+    def raw_store(self, statement:str):
+        cursor.execute(statement)
+        cnx.commit()
+    
     def create(self, **query_fields):
         table = vars(self.__class__)["table_name"]
         fields = []
@@ -67,16 +89,20 @@ class Table:
             values.append(val)
 
         query = f"INSERT INTO {table} ({", ".join(fields)}) VALUES ({", ".join([f"'{val}'" for val in values])})"
-        print(query)
+        print("Create:", query)
+        cursor.execute(query)
+        cnx.commit()
 
-    def update(self, condition, **query_fields):
+    def update(self, condition:str, **query_fields):
         values = []
         table = vars(self.__class__)["table_name"]
         for key, val in query_fields.items():
-            values.append(f"'{key}'='{val}'")
+            values.append(f"{key}='{val}'")
 
         query = f"UPDATE {table} SET {", ".join(values)} WHERE {condition}"
-        print(query)
+        print("Update:", query)
+        cursor.execute(query)
+        cnx.commit()
 
     def create_table(self):
         fields = self.get_fields(as_obj=True)
@@ -85,5 +111,7 @@ class Table:
             query.append(i.get())
 
         query = f"CREATE TABLE {fields[0].table_name} ({", ".join(query)})"
-        print(query)
-
+        print("Create_Table:", query)
+        cursor.execute(query)
+        cnx.commit()
+        cnx.commit()
