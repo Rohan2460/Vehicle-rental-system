@@ -2,31 +2,51 @@ from orm import Table, Field
 
 class Customer(Table):
     table_name = "Customer"
-    CustomerID = Field(int, primary_key=True, auto_increment=True)
-    Name = Field(str)
-    Email = Field(str)
+    customerID = Field(int, primary_key=True, auto_increment=True)
+    name = Field(str)
+    email = Field(str)
+    phone = Field(int)
+    licenseNumber = Field(str)
+
+
+class Employee(Table):
+    table_name = "Employees"
+    employeeID = Field(int, primary_key=True, auto_increment=True)
+    name = Field(str)
+    email = Field(str)
+    phone = Field(int)
+    role = Field(str)
+
+
+class Vehicle(Table):
+    table_name = "Vehicle"
+    vehicleID = Field(int, primary_key=True, auto_increment=True)
+    model = Field(str)
+    year = Field(int)
+    availabilityStatus = Field(str)
+
 
 class Booking(Table):
     table_name = "Bookings"
-    BookingID = Field(int, max=10, primary_key=True, auto_increment=True)
-    BookingStatus = Field(str)
-    TotalAmount = Field(int)
-    CustomerID = Field(int, Customer.CustomerID)
+    bookingID = Field(int, primary_key=True, auto_increment=True)
+    vehicleID = Field(int, foreign_key=Vehicle.vehicleID)
+    bookingStartDate = Field(str)
+    bookingEndDate = Field(str)
+    employeeID = Field(int, foreign_key=Employee.employeeID)
+    bookingStatus = Field(str)
+    totalAmount = Field(int)
+    customerID = Field(int, foreign_key=Customer.customerID)
 
-class Employee(Table):
-    table_name = "Employee"
-    EmployeeID = Field(int, max=10, primary_key=True, auto_increment=True)
-    Name = Field(str)
-    Email = Field(str)
-    Phone = Field(int, max=10)
-    booking = Field(int, max=10, foreign_key=Booking.BookingID)
 
+class Payments(Table):
+    table_name = "Payments"
+    paymentID = Field(int, primary_key=True, auto_increment=True)
+    bookingID = Field(int, foreign_key=Booking.bookingID)
+    paymentDate = Field(str)
+    paymentAmount = Field(int)
 
 customer = Customer()
-booking = Booking()
-# customer.create(Name="Mike", Email="mike@email.com")
-# customer.update("name='John'", Email="johm@email.com")
 employee = Employee()
-employee.create_table()
-print(customer.fetch())
-print(booking.fetch(["BookingID"]))
+vehicle = Vehicle()
+booking = Booking()
+payments = Payments()

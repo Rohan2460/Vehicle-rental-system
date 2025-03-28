@@ -47,20 +47,22 @@ class Table:
                 data.append(value if as_obj else key)
         return data
     
-    def fetch(self, fields:list=None) -> list[dict]:   
+    def fetch(self, fields:list=None, condition:str=None, join:str=None, return_as_txt=False) -> list[dict]:   
         data = self.get_fields()
         query = ""
         _fields = []
 
         if not fields == None:
             if not len(fields) == len(data):
-                for i in fields:
-                    _fields.append(i)
-                _fields
+                _fields = [i for i in fields]
 
         query = ", ".join(_fields)  if _fields else "*"
         query = "SELECT " + query + f" FROM {vars(self.__class__)["table_name"]}"
-
+        if condition:
+            query += " WHERE " + condition
+        if return_as_txt:
+            return query
+        
         print("Fetch:", query)
         cursor.execute(query)
 
@@ -72,11 +74,21 @@ class Table:
             temp_list.append(temp_dict)
         return temp_list
     
-    def raw_fetch(self, statement:str):
+    def raw_fetch(self, statement:str, named:bool=False, fields:list=None):
+        print("Raw Fetch:", statement)
         cursor.execute(statement)
-        return cursor.fetchall()
+        data = self.get_fields()
+
+        temp_list = []
+        for tup in cursor.fetchall():
+            temp_dict = {} 
+            for val, name in zip(tup, fields if fields else data):
+                temp_dict[name] = val
+            temp_list.append(temp_dict)
+        return temp_list
 
     def raw_store(self, statement:str):
+        print("Raw Store:", statement)
         cursor.execute(statement)
         cnx.commit()
     

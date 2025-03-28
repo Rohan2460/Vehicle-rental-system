@@ -1,8 +1,13 @@
 from db import cursor, cnx
+from models import *
 
-cursor.execute("CREATE DATABASE vehicle_rental_db")
-cursor.execute("USE vehicle_rental_db")
-cursor.execute("CREATE TABLE Customer (CustomerID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, Name VARCHAR(255), Email VARCHAR(255))")
-cursor.execute("CREATE TABLE Bookings (BookingID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, BookingStatus VARCHAR(255), TotalAmount INT, CustomerID INT, FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID))")
-cnx.commit()
-# schema here 
+tables = [Customer(), Employee(), Vehicle(), Booking(), Payments()]
+for table in tables:
+    table.create_table()
+
+vehicle.create(model="Toyota Yaris", year=2009, availabilityStatus="available")
+vehicle.create(model="Honda Amaze", year=2015, availabilityStatus="available")
+employee.create(name="John", email="john@email.com", phone=123456789, role="Salesman")
+employee.create(name="Mike", email="mike@email.com", phone=456789012, role="Salesman")
+
+customer.create(name="Walter", email="walter@email.com", phone=453389012, licenseNumber="327 2153")

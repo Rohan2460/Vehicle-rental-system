@@ -1,23 +1,50 @@
 <form action="/data" method="post">
-    <label for="">Data</label>
-    <input type="text" name="data">
+    <label for="">Vehicle</label>
+    <select name="vehicle" >
 
+        {% for i in vehicle %}
+            <p>{{i['vehicleID']}}</p>
+            <option value="{{i['vehicleID']}}">{{i['model']}}</option>
+        {% endfor %}
+    </select>
+    
+    <label for="">Start Date</label>
+    <input type="date" name="date_start">
+
+    <label for="">End Date</label>
+    <input type="date" name="date_end">
+    <br>
+    <label for="">Employee</label>
+    <select name="employee">
+        {% for i in emp %}
+            <option value="{{i['employeeID']}}">{{i['name']}}</option>
+        {% endfor %}
+    </select>
+    
+    <label for="">Status</label>
+    <select name="status">
+        <option value="NEW">NEW</option>
+        <option value="ASSIGNED">ASSIGNED</option>
+        <option value="CLOSED">CLOSED</option>
+    </select>
+    
+    <br>
     <label for="">Amount</label>
-    <input type="text" name="amount">
+    <input type="number" name="amount">
 
     <label for="">Customer ID</label>
-    <input type="text" name="c_id">
+    <input type="text" name="c_id" value="{{customer['customerID']}}">
 
     <button type="submit">Submit</button>
 </form>
 
 <hr>
+<h3>Bookings of {{customer['name']}}</h3>
 {% if data %}
-<h3>Bookings of {{customer}}</h3>
-{% for item in data %}
-    <span>ID: {{item[0]}} | </span>
-    <span>Data: {{item[1]}} | </span>
-    <span>Amount: {{item[2]}}</span>
+{% for i in data %}
+    {% for key, val in i.items() %}
+        <span>{{key}}: {{val}}</span> <br>
+    {% endfor %}
     <hr>
 {% endfor %}
 
