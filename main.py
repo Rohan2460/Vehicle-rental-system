@@ -65,10 +65,12 @@ def signup():
 
 @app.route("/")
 def index():
-    data = booking.raw_fetch(booking.fetch(return_as_txt=True) + f" b JOIN Customer c ON b.customerID = c.customerID WHERE name='{session['username']}'", named=True)
+    if not session:
+        return redirect("/login")
+    data = booking.raw_fetch(booking.fetch(return_as_txt=True) + f" JOIN Customer c ON Bookings.customerID = c.customerID WHERE c.name='{session['username']}' AND bookingStatus!='CLOSED' ", named=True)
     person = customer.fetch(condition=f"name='{session['username']}'")[0]
     emps = employee.fetch()
-    veh = vehicle.fetch()
+    veh = vehicle.fetch(condition="availabilityStatus='available'")
     return render_template("submit.html", data=data, customer=person, emp=emps, vehicle=veh)
 
 @app.route("/data", methods=["POST"])
@@ -83,12 +85,31 @@ def get_data():
         c_id = request.form["c_id"]
 
         booking.create(vehicleID=vehicleId, bookingStartDate=date_start, 
-                       bookingEndDate=date_start, employeeID=empId, 
+                       bookingEndDate=date_end, employeeID=empId, 
                        bookingStatus=status, totalAmount=amount, customerID=c_id)
+        vehicle.update(condition=f"vehicleID='{vehicleId}'", availabilityStatus="not available")
 
     return redirect("/")
 
+@app.route("/manage")
+def manage():
 
+    table = vehicle.raw_fetch("""SELECT B.bookingID, B.bookingStatus, E.name, V.model, C.name FROM Bookings B 
+                              JOIN Customer C ON C.customerID = B.customerID
+                              JOIN Employees E ON E.employeeID = B.employeeID
+                              JOIN Vehicle V ON V.vehicleID = B.vehicleID """, named=True, fields=["bookingID", "status", "employee", "vehicle", "customer"])
+    data = { "joined table": table, "vehicles" : vehicle.fetch(), "employees": employee.fetch(), "bookings": booking.fetch(), "customers": customer.fetch()}
+
+    return render_template("manage.html", context=data)
+
+@app.route("/close")
+def set_data():
+    id = request.args.get("id")
+    booking.update(condition="bookingID=" + id, bookingStatus="CLOSED")
+    v_id = booking.fetch(["vehicleID"], condition="bookingID=" + id)[0]["vehicleID"]
+    vehicle.update(condition=f"vehicleID={v_id}", availabilityStatus="available")
+
+    return redirect("/manage")
 
 if __name__ == "__main__":
     app.run()

@@ -35,7 +35,6 @@ class Field:
         return query
 
 
-
 class Table:
     cnx = cnx
     cursor = cursor
@@ -78,9 +77,12 @@ class Table:
         print("Raw Fetch:", statement)
         cursor.execute(statement)
         data = self.get_fields()
-
+        data_list = cursor.fetchall()
+        if not named:
+            return data_list
+        
         temp_list = []
-        for tup in cursor.fetchall():
+        for tup in data_list:
             temp_dict = {} 
             for val, name in zip(tup, fields if fields else data):
                 temp_dict[name] = val
@@ -125,5 +127,4 @@ class Table:
         query = f"CREATE TABLE {fields[0].table_name} ({", ".join(query)})"
         print("Create_Table:", query)
         cursor.execute(query)
-        cnx.commit()
         cnx.commit()

@@ -1,0 +1,67 @@
+<style>
+    #item {
+        padding: 2px;
+        background-color: rgb(245, 245, 245);
+        margin: 3px;
+        margin-bottom: 5px;
+        border: 1px solid black;
+        border-radius: 3px;
+    }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        padding-right: 20px;
+    }
+    .item_container{
+        display:flex;
+        flex-flow: column;
+        padding: 10px;
+        background-color: rgb(240, 240, 240);
+        margin: 10px;
+        border-radius: 5px;
+    }
+    #index {
+        text-align: center; margin: 0px;
+    }
+    .col {
+        display: flex; flex-direction: column;
+        /* justify-content: center; */
+        align-items: center;
+    }
+    button{
+        border: 1px solid gray;
+    }
+</style>
+
+{% for title_name, item_list in context.items() %}
+<details open>
+<summary>{{ title_name.title() }}</summary>
+<h3>{{ title_name.title() }}</h3>
+    <div class="container">    
+    {% for item in item_list %}
+        <div class="col" >
+            {% if title_name == "joined table" %}
+                <div class="">
+                    <span id="index">{{loop.index}}).</span>
+                    <span>Action</span>
+                    <form action="/close" style="display: inline;">
+                        <input type="hidden" value="{{ item['bookingID']}}" name="id">
+                        <input type="submit" value="Set Closed" >
+                    </form>
+                </div>
+            {% else %}
+                <span id="index" style="align-self: start;margin-left: 15px;">{{loop.index}}).</span>
+            {% endif%}
+                <div class="item_container" style="background-color: {% if loop.index0 % 2 == 0 %} rgb(150, 150, 150) {% endif %} ">
+                    {% for key , val in item.items() %}
+                    <span id="item">{{ key }}: {{ val }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+<hr>
+</details>
+
+{% endfor %}
