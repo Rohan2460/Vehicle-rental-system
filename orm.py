@@ -1,6 +1,3 @@
-from db import cursor, cnx
-
-
 class Field:
     name = None
     field_type = None
@@ -36,8 +33,12 @@ class Field:
 
 
 class Table:
-    cnx = cnx
-    cursor = cursor
+    cnx = None
+    cursor = None
+
+    def __init__(self):
+        if not self.cursor or not self.cnx:
+            raise ValueError("Database connection and cursor not set")
 
     def get_fields(self, as_obj=False) -> list[str | Field]:
         data = []
@@ -63,10 +64,10 @@ class Table:
             return query
         
         print("Fetch:", query)
-        cursor.execute(query)
+        self.cursor.execute(query)
 
         temp_list = []
-        for tup in cursor.fetchall():
+        for tup in self.cursor.fetchall():
             temp_dict = {} 
             for val, name in zip(tup, fields if fields else data):
                 temp_dict[name] = val
@@ -75,9 +76,9 @@ class Table:
     
     def raw_fetch(self, statement:str, named:bool=False, fields:list=None):
         print("Raw Fetch:", statement)
-        cursor.execute(statement)
+        self.cursor.execute(statement)
         data = self.get_fields()
-        data_list = cursor.fetchall()
+        data_list = self.cursor.fetchall()
         if not named:
             return data_list
         
@@ -91,8 +92,8 @@ class Table:
 
     def raw_store(self, statement:str):
         print("Raw Store:", statement)
-        cursor.execute(statement)
-        cnx.commit()
+        self.cursor.execute(statement)
+        self.cnx.commit()
     
     def create(self, **query_fields):
         table = vars(self.__class__)["table_name"]
@@ -104,8 +105,8 @@ class Table:
 
         query = f"INSERT INTO {table} ({", ".join(fields)}) VALUES ({", ".join([f"'{val}'" for val in values])})"
         print("Create:", query)
-        cursor.execute(query)
-        cnx.commit()
+        self.cursor.execute(query)
+        self.cnx.commit()
 
     def update(self, condition:str, **query_fields):
         values = []
@@ -115,8 +116,8 @@ class Table:
 
         query = f"UPDATE {table} SET {", ".join(values)} WHERE {condition}"
         print("Update:", query)
-        cursor.execute(query)
-        cnx.commit()
+        self.cursor.execute(query)
+        self.cnx.commit()
 
     def create_table(self):
         fields = self.get_fields(as_obj=True)
@@ -126,5 +127,5 @@ class Table:
 
         query = f"CREATE TABLE {fields[0].table_name} ({", ".join(query)})"
         print("Create_Table:", query)
-        cursor.execute(query)
-        cnx.commit()
+        self.cursor.execute(query)
+        self.cnx.commit()

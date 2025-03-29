@@ -1,4 +1,5 @@
 from orm import Table, Field
+from db import cursor, cnx
 
 class Customer(Table):
     table_name = "Customer"
@@ -44,6 +45,10 @@ class Payments(Table):
     bookingID = Field(int, foreign_key=Booking.bookingID)
     paymentDate = Field(str)
     paymentAmount = Field(int)
+
+
+Table.cnx = cnx
+Table.cursor = cursor
 
 customer = Customer()
 employee = Employee()
