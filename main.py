@@ -27,11 +27,13 @@ def login():
         return "Invalid"
             
     return '''
+        <h1>LogIn</h1>
         <form method="post">
             <p>Name <input type=text name=name>
             <p>Email <input type=text name=email>
             <p><input type=submit value=Login>
-        </form>
+        </form> <hr>
+        <a href="/signup">Signup</a>
     '''
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -53,13 +55,15 @@ def signup():
         return "Already exist / Error"
         
     return '''
+        <h1>SignUp</h1>
         <form method="post">
             <p>Name <input type=text name=name>
             <p>Email <input type=text name=email>
             <p>Phone <input type=text name=phone>
             <p>License <input type=text name=lic>
-            <p><input type=submit value=signup>
-        </form>
+            <p><input type=submit value=SignUp>
+        </form> <hr>
+        <a href="/login">Login</a>
     '''
 
 
@@ -94,10 +98,10 @@ def get_data():
 @app.route("/manage")
 def manage():
 
-    table = vehicle.raw_fetch("""SELECT B.bookingID, B.bookingStatus, E.name, V.model, C.name FROM Bookings B 
+    table = vehicle.raw_fetch("""SELECT B.bookingID, B.bookingStatus, E.name, V.model, C.name, B.bookingStartDate FROM Bookings B 
                               JOIN Customer C ON C.customerID = B.customerID
                               JOIN Employees E ON E.employeeID = B.employeeID
-                              JOIN Vehicle V ON V.vehicleID = B.vehicleID """, named=True, fields=["bookingID", "status", "employee", "vehicle", "customer"])
+                              JOIN Vehicle V ON V.vehicleID = B.vehicleID """, named=True, fields=["bookingID", "status", "employee", "vehicle", "customer", "date"])
     data = { "joined table": table, "vehicles" : vehicle.fetch(), "employees": employee.fetch(), "bookings": booking.fetch(), "customers": customer.fetch()}
 
     return render_template("manage.html", context=data)

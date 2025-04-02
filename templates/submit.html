@@ -1,45 +1,69 @@
-<div>
+<style>
+    .nav{
+        display: flex;
+        gap: 10px;
+        /* padding: 10px; */
+    }
+    .main{
+        display: inline-grid;
+        gap: 10px;
+    }
+    button {
+        max-width: 200px;
+        height: 30px;
+    }
+</style>
+
+
+<div class="nav">
     <a href="/manage">Manager</a> <a href="/login">Login</a> <a href="/signup">Signup</a>
 </div>
 <hr>
 <form action="/data" method="post">
-    <label for="">Vehicle</label>
-    <select name="vehicle" >
+    <div class="main">
+        <div class="">
+            <label for="">Vehicle</label>
+            <select name="vehicle" >
+                {% for i in vehicle %}
+                    <p>{{i['vehicleID']}}</p>
+                    <option value="{{i['vehicleID']}}">{{i['model']}}</option>
+                {% endfor %}
+            </select>
+            <label for="">Employee</label>
+            <select name="employee">
+                {% for i in emp %}
+                    <option value="{{i['employeeID']}}">{{i['name']}}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-        {% for i in vehicle %}
-            <p>{{i['vehicleID']}}</p>
-            <option value="{{i['vehicleID']}}">{{i['model']}}</option>
-        {% endfor %}
-    </select>
-    
-    <label for="">Start Date</label>
-    <input type="date" name="date_start">
+        
+        <div class="">
+            <label for="">Start Date</label>
+            <input type="date" name="date_start">
+            <label for="">End Date</label>
+            <input type="date" name="date_end">
+        </div>
+        
+        <div class="">
+            <label for="">Status</label>
+            <select name="status">
+                <option value="NEW">NEW</option>
+                <option value="ASSIGNED">ASSIGNED</option>
+                <option value="CLOSED">CLOSED</option>
+            </select>
+        </div>
+        
 
-    <label for="">End Date</label>
-    <input type="date" name="date_end">
-    <br>
-    <label for="">Employee</label>
-    <select name="employee">
-        {% for i in emp %}
-            <option value="{{i['employeeID']}}">{{i['name']}}</option>
-        {% endfor %}
-    </select>
-    
-    <label for="">Status</label>
-    <select name="status">
-        <option value="NEW">NEW</option>
-        <option value="ASSIGNED">ASSIGNED</option>
-        <option value="CLOSED">CLOSED</option>
-    </select>
-    
-    <br>
-    <label for="">Amount</label>
-    <input type="number" name="amount">
+        <div class="">
+            <label for="">Amount</label>
+            <input type="number" name="amount">
+            <label for="">Customer ID</label>
+            <input type="text" name="c_id" value="{{customer['customerID']}}" readonly>
+        </div>
 
-    <label for="">Customer ID</label>
-    <input type="text" name="c_id" value="{{customer['customerID']}}">
-
-    <button type="submit">Submit</button>
+        <button type="submit">Submit</button>
+    </div>
 </form>
 
 <hr>

@@ -31,8 +31,17 @@
     button{
         border: 1px solid gray;
     }
+    .nav{
+        display: flex;
+        gap: 10px;
+    }
 </style>
 
+
+<div class="nav">
+    <a href="/">Book</a> <a href="/login">Login</a> <a href="/signup">Signup</a>
+</div>
+<hr>
 {% for title_name, item_list in context.items() %}
 <details open>
 <summary>{{ title_name.title() }}</summary>
